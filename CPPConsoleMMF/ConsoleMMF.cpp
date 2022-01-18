@@ -18,6 +18,8 @@ int main(int argc, char** argv)
 ConsoleMMF::ConsoleMMF()
 {
 	m_bRunningState = true;
+	m_pFileMappingHandle = NULL;
+	m_pSharedMemData = NULL;
 	ConsoleCommands();
 }
 
@@ -49,5 +51,19 @@ void ConsoleMMF::ConsoleCommands()
 			m_bRunningState = false;
 		else
 			DisplayConsole();
+	}
+}
+
+void ConsoleMMF::LinkMMFData()
+{
+	if ((m_pFileMappingHandle = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(SharedData), L"WPFWithCPPMMF")) == NULL)
+	{
+		if ((m_pSharedMemData = (SharedData*)MapViewOfFile(m_pFileMappingHandle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedData))) == NULL)
+			return;
+	}
+	else
+	{
+		if (m_pSharedMemData == NULL)
+			m_pSharedMemData = new SharedData();
 	}
 }
