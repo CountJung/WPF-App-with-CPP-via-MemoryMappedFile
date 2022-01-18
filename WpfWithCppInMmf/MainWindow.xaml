@@ -29,7 +29,7 @@
                 This Will be changed <LineBreak/>
                 via CPP Console :)
             </TextBlock>
-            <Button Grid.Column="1" Content="Call CPP Console" Foreground="AntiqueWhite" Background="Teal"/>
+            <Button Grid.Column="1" Content="Call CPP Console" Foreground="AntiqueWhite" Background="Teal" Command="{Binding CmdOpenCPPConsole}"/>
         </Grid>
     </Grid>
 </Window>

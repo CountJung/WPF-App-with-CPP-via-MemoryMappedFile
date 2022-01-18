@@ -20,6 +20,7 @@ ConsoleMMF::ConsoleMMF()
 	m_bRunningState = true;
 	m_pFileMappingHandle = NULL;
 	m_pSharedMemData = NULL;
+	LinkMMFData();
 	ConsoleCommands();
 }
 
@@ -34,7 +35,9 @@ void ConsoleMMF::DisplayConsole()
 	cout << "==== Licence is MIT  ============================" << endl;
 	cout << "==== Commands shown as below ====================" << endl;
 	cout << "==== exit = exit console application ============" << endl;
-	cout << "==== Text = Change WPF TextBlock ================" << endl;
+	cout << "==== int = Change WPF TextBlock Color ===========" << endl;
+	cout << "==== double = Change WPF TextBlock Data =========" << endl;
+	cout << "==== text = Change WPF TextBlock ================" << endl;
 	cout << "=================================================" << endl;
 }
 
@@ -49,6 +52,27 @@ void ConsoleMMF::ConsoleCommands()
 		cout << "Input : " << str << endl;
 		if (str == "exit")
 			m_bRunningState = false;
+		if (str == "int")
+		{
+			cout << "Input int : ";
+			cin >> str;
+			cout << "int Data = " << str << endl;
+			m_pSharedMemData->integerData = stoi(str);
+		}
+		if (str == "double")
+		{
+			cout << "Input double : ";
+			cin >> str;
+			cout << "double Data = " << str << endl;
+			m_pSharedMemData->doubleData = stod(str);
+		}
+		if (str == "text")
+		{
+			cout << "Input text : ";
+			cin >> str;
+			cout << "text Data = " << str << endl;
+			strcpy_s(m_pSharedMemData->stringData, str.c_str());
+		}
 		else
 			DisplayConsole();
 	}
@@ -56,14 +80,14 @@ void ConsoleMMF::ConsoleCommands()
 
 void ConsoleMMF::LinkMMFData()
 {
-	if ((m_pFileMappingHandle = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(SharedData), L"WPFWithCPPMMF")) == NULL)
+	if ((m_pFileMappingHandle = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, /*268*/sizeof(SharedData), L"WPFWithCPPMMF")) == NULL)
 	{
-		if ((m_pSharedMemData = (SharedData*)MapViewOfFile(m_pFileMappingHandle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedData))) == NULL)
-			return;
+		cout << "Map Handle Fail" << endl;
+		return;
 	}
-	else
+	if ((m_pSharedMemData = (SharedData*)MapViewOfFile(m_pFileMappingHandle, FILE_MAP_ALL_ACCESS, 0, 0, /*268*/sizeof(SharedData))) == NULL)
 	{
-		if (m_pSharedMemData == NULL)
-			m_pSharedMemData = new SharedData();
+		cout << "ShareMemData Fail" << endl;
+		return;
 	}
 }
