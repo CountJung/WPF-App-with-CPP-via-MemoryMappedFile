@@ -52,22 +52,26 @@ void ConsoleMMF::ConsoleCommands()
 		cout << "Input : " << str << endl;
 		if (str == "exit")
 			m_bRunningState = false;
-		if (str == "int")
+		else if (str == "int")
 		{
+			cout << "Textblock background color change to" << endl;
+			cout << "0:Teal, 1:Orange, 2:Pink, Default:Beige" << endl;
 			cout << "Input int : ";
 			cin >> str;
 			cout << "int Data = " << str << endl;
 			m_pSharedMemData->integerData = stoi(str);
 		}
-		if (str == "double")
+		else if (str == "double")
 		{
+			cout << "Textblock double data" << endl;
 			cout << "Input double : ";
 			cin >> str;
 			cout << "double Data = " << str << endl;
 			m_pSharedMemData->doubleData = stod(str);
 		}
-		if (str == "text")
+		else if (str == "text")
 		{
+			cout << "Textblock string data" << endl;
 			cout << "Input text : ";
 			cin >> str;
 			cout << "text Data = " << str << endl;

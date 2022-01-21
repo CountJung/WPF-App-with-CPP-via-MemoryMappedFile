@@ -8,12 +8,14 @@ using namespace std;
 #include <Windows.h>
 #include <WinSock2.h>
 
+//Data Paddig Refernce
+//https://en.wikipedia.org/wiki/Data_structure_alignment
 struct SharedData
 {
 	int integerData;       //4 byte
 	double doubleData;     //8 byte
 	char stringData[256];  //256 byte
-};
+}; //But, Actual Size of this Structure is 272  4 + 8 + 256 = 268 + 4 (Padding) = 272
 
 class ConsoleMMF
 {
