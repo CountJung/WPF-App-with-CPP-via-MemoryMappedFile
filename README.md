@@ -45,3 +45,7 @@ https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packin
 
 * if you don't want to calculate data padding then just get sizeof(structure) in CPP code and assign bytes to C# code, that's easy and fast.
 
+* Quick Calculation - assume 64bit
+
+   <sub>(4+8+256) = 268 / 8 = 33.5</sub></br>
+   <sub>(4+8+256) + 4 = 272 / 8 = 34</sub>
