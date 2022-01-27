@@ -97,13 +97,14 @@ namespace WPFAppCPPMMF
                   {
                       if (token.IsCancellationRequested)
                           break;
-
-                      lock (justLock)
-                          accessorMMF.Read<SharedData>(0, out shareDataWithCPP);
+                      //My Mistake
+                      //lock (justLock)
+                      //    accessorMMF.Read<SharedData>(0, out shareDataWithCPP);
                       
                       //Data Conversion
                       byte[] buffer = new byte[shareMemBufferSize];
-                      accessorMMF.ReadArray(0, buffer, 0, buffer.Length);
+                      lock (justLock)
+                          accessorMMF.ReadArray(0, buffer, 0, buffer.Length);
                       int intData = BitConverter.ToInt32(buffer, 0);
                       double doubleData = BitConverter.ToDouble(buffer, 8);
                       string stringData = Encoding.ASCII.GetString(buffer, 16, 256);
