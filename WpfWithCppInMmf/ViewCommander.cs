@@ -9,14 +9,14 @@ namespace WPFAppCPPMMF
 {
     public class ViewCommander : ICommand
     {
-        private readonly Action<object> action;
-        private readonly Func<object, bool> canExecute;
+        private readonly Action<object>? action;
+        private readonly Func<object, bool>? canExecute;
 
-        public ViewCommander(Action<object> act) : this(act, null)
+        public ViewCommander(Action<object>? act) : this(act, null)
         {
 
         }
-        public ViewCommander(Action<object> act, Func<object, bool> canAct = null)
+        public ViewCommander(Action<object>? act, Func<object, bool>? canAct = null)
         {
             action = act;
             canExecute = canAct ?? (param => true);
@@ -27,9 +27,9 @@ namespace WPFAppCPPMMF
             remove => CommandManager.RequerySuggested -= value;
         }
 
-        public bool CanExecute(object parameter) => canExecute(parameter);
+        public bool CanExecute(object? parameter) => canExecute!(parameter!);
         
-        public void Execute(object parameter) => action(parameter);
+        public void Execute(object? parameter) => action!(parameter!);
         
     }
 }

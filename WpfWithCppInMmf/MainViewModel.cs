@@ -63,7 +63,7 @@ namespace WPFAppCPPMMF
             accessorMMF = null;
             ctsForMMFTask = new CancellationTokenSource();
             justLock = new object();
-            TextBlockBrush = (Brush) new BrushConverter().ConvertFromString("Beige");
+            TextBlockBrush = (Brush) new BrushConverter().ConvertFromString("Beige")!;
             CmdOpenOrCreate = new ViewCommander(act => OpenOrCreateMMF());
             CmdOpenCPPConsole = new ViewCommander(act => OpenCPPConsole());
         }
@@ -118,16 +118,16 @@ namespace WPFAppCPPMMF
                           switch (intData)
                           {
                               case 0:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Teal");
+                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Teal")!;
                                   break;
                               case 1:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Orange");
+                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Orange")!;
                                   break;
                               case 2:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Pink");
+                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Pink")!;
                                   break;
                               default:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Beige");
+                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Beige")!;
                                   break;
                           }
                           ControlledText = string.Format($"TextData = {stringData}{Environment.NewLine}DoubleData = {doubleData}");
