@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace WPFAppCPPMMF
 {
@@ -25,7 +20,7 @@ namespace WPFAppCPPMMF
         public ViewCommander CmdOpenOrCreate { get; private set; }
         public ViewCommander CmdOpenCPPConsole { get; private set; }
         //control
-        private string controlledText=$"This will be changed{Environment.NewLine}via console commands";
+        private string controlledText = $"This will be changed{Environment.NewLine}via console commands";
         public string ControlledText
         {
             get => controlledText;
@@ -56,6 +51,7 @@ namespace WPFAppCPPMMF
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private object justLock;
+        private EventWaitHandle eventWaitHandle = new AutoResetEvent(false);
         public MainViewModel()
         {
             shareDataWithCPP = new SharedData() { doubleData = 0, integerData = 0, stringData = 0 };
@@ -63,7 +59,7 @@ namespace WPFAppCPPMMF
             accessorMMF = null;
             ctsForMMFTask = new CancellationTokenSource();
             justLock = new object();
-            TextBlockBrush = (Brush) new BrushConverter().ConvertFromString("Beige")!;
+            TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Beige")!;
             CmdOpenOrCreate = new ViewCommander(act => OpenOrCreateMMF());
             CmdOpenCPPConsole = new ViewCommander(act => OpenCPPConsole());
         }
@@ -78,7 +74,7 @@ namespace WPFAppCPPMMF
         }
         private void OpenOrCreateMMF()
         {
-            if(watchMMFTask != null)
+            if (watchMMFTask != null)
             {
                 ctsForMMFTask.Cancel();
                 watchMMFTask.Wait();
@@ -88,19 +84,18 @@ namespace WPFAppCPPMMF
             // this Class does not supported in .net5, .net6
             //MemoryMappedFileSecurity securityMMF = new MemoryMappedFileSecurity();
             MemoryMappedFile mapFile = MemoryMappedFile.CreateOrOpen("WPFWithCPPMMF", shareMemBufferSize, MemoryMappedFileAccess.ReadWrite);
-            accessorMMF=mapFile.CreateViewAccessor(/*0, 268, MemoryMappedFileAccess.ReadWrite*/);
+            accessorMMF = mapFile.CreateViewAccessor(/*0, 268, MemoryMappedFileAccess.ReadWrite*/);
             CancellationToken token = ctsForMMFTask.Token;
 
-            watchMMFTask = Task.Run(async () =>
+            watchMMFTask = Task.Run(/*async*/ () =>
               {
                   while (true)
                   {
-                      if (token.IsCancellationRequested)
+                      if (eventWaitHandle.WaitOne(1))
                           break;
-                      //My Mistake
-                      //lock (justLock)
-                      //    accessorMMF.Read<SharedData>(0, out shareDataWithCPP);
-                      
+                      //if (token.IsCancellationRequested)
+                      //    break;
+
                       //Data Conversion
                       byte[] buffer = new byte[shareMemBufferSize];
                       lock (justLock)
@@ -112,32 +107,35 @@ namespace WPFAppCPPMMF
                       int zeroPos = stringData.IndexOf('\0');
                       stringData = stringData.Remove(zeroPos);
 
-                      //Lamda has lamda :)
-                      Dispatcher.CurrentDispatcher.Invoke(() =>
+                      //https://stackoverflow.com/questions/10448987/dispatcher-currentdispatcher-vs-application-current-dispatcher
+                      //https://stackoverflow.com/questions/8994714/updating-bound-properties-from-a-background-thread
+                      //Dispatcher.CurrentDispatcher.Invoke(() =>
+                      //{
+                      switch (intData)
                       {
-                          switch (intData)
-                          {
-                              case 0:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Teal")!;
-                                  break;
-                              case 1:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Orange")!;
-                                  break;
-                              case 2:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Pink")!;
-                                  break;
-                              default:
-                                  TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Beige")!;
-                                  break;
-                          }
-                          ControlledText = string.Format($"TextData = {stringData}{Environment.NewLine}DoubleData = {doubleData}");
-                      });
-                      await Task.Delay(1);
+                          case 0:
+                              TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Teal")!;
+                              break;
+                          case 1:
+                              TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Orange")!;
+                              break;
+                          case 2:
+                              TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Pink")!;
+                              break;
+                          default:
+                              TextBlockBrush = (Brush)new BrushConverter().ConvertFromString("Beige")!;
+                              break;
+                      }
+                      ControlledText = string.Format($"TextData = {stringData}{Environment.NewLine}DoubleData = {doubleData}");
+                      //});
+                      //await Task.Delay(1);
                   }
               }/*, token*/);
         }
         public void CloseWindow()
         {
+            eventWaitHandle.Set();
+            eventWaitHandle.Close();
             ctsForMMFTask.Cancel();
             watchMMFTask?.Wait();
         }
