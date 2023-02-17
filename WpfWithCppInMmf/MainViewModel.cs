@@ -76,6 +76,7 @@ namespace WPFAppCPPMMF
         {
             if (watchMMFTask != null)
             {
+                eventWaitHandle.Set();
                 ctsForMMFTask.Cancel();
                 watchMMFTask.Wait();
                 ctsForMMFTask.Dispose();
